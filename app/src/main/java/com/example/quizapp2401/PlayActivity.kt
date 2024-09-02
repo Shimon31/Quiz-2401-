@@ -1,7 +1,12 @@
 package com.example.quizapp2401
 
+import android.app.Dialog
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
+import android.widget.RadioButton
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -11,6 +16,7 @@ class PlayActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityPlayBinding
 
+    var updateQuestion = 1
 
     val quizList = listOf<Quiz>(
 
@@ -52,6 +58,10 @@ class PlayActivity : AppCompatActivity() {
     )
 
     var index = 0
+    var hasFinished = false
+    var skip = -1
+    var correct = 0
+    var wrong = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +69,12 @@ class PlayActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         initQuestion()
+
+        binding.nextBtn.setOnClickListener {
+
+            showNextQuestion()
+
+        }
 
 
     }
@@ -78,4 +94,92 @@ class PlayActivity : AppCompatActivity() {
 
 
     }
+
+    private fun showNextQuestion() {
+        checkAnswer()
+        binding.apply {
+
+            if (updateQuestion < quizList.size) {
+                updateQuestion++
+                initQuestion()
+            } else if (index <= quizList.size - 1) {
+                index++
+            } else {
+                hasFinished = true
+            }
+
+            radioGroup.clearCheck()
+
+        }
+
+
+    }
+
+    private fun checkAnswer() {
+
+        binding.apply {
+
+            if (radioGroup.checkedRadioButtonId == -1) {
+
+                skip++
+            } else {
+                val checkButton = findViewById<RadioButton>(radioGroup.checkedRadioButtonId)
+                val checkAnswer = checkButton.text.toString()
+
+                if (checkAnswer == quizList[index].answer) {
+
+                    correct++
+                    showAlertDialouge("Correct Answer")
+
+                } else {
+                    wrong++
+                    showAlertDialouge("Wrong Answer")
+                }
+
+
+            }
+
+            if (index <= quizList.size - 1) {
+                index++
+            } else {
+                showAlertDialouge("Finished")
+            }
+
+
+        }
+
+    }
+
+
+    fun showAlertDialouge(message: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(message)
+
+        builder.setPositiveButton("ok", object : DialogInterface.OnClickListener {
+            override fun onClick(p0: DialogInterface?, p1: Int) {
+
+                if (message == "Finished") {
+                    val intent = Intent(this@PlayActivity, ResultActivity::class.java)
+                    intent.putExtra("skip", skip)
+                    intent.putExtra("correct", correct)
+                    intent.putExtra("wrong", wrong)
+
+
+
+                    startActivity(intent)
+
+                }
+
+            }
+
+
+        })
+
+        var alertDialog = builder.create()
+        alertDialog.show()
+
+
+    }
+
+
 }

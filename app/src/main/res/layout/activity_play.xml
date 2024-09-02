@@ -82,7 +82,7 @@
         android:id="@+id/nextBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Next Quesation"
+        android:text="Next "
         android:background="#036E08"
         android:textColor="@color/white"
         android:layout_marginHorizontal="10dp"
